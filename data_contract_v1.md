@@ -44,11 +44,21 @@ No additional columns are allowed.
 | sensor_id | string | unique sensor identifier |
 | value | float | measured value |
 
-Example row:
+clean.parquet contains an additional column:
+
+| quality_flag | int | data quality indicator (clean dataset only) |
+
+Example row (raw.parquet):
 
 | ts | sensor_id | value |
 |----|-----------|------|
 | 2025-01-01T10:00:00Z | pump01_temp_motor | 63.2 |
+
+Example row (clean.parquet):
+
+| ts | sensor_id | value | quality_flag |
+|----|-----------|------|--------------|
+| 2025-01-01T10:00:00Z | pump01_temp_motor | 63.2 | 0 |
 
 ---
 
@@ -199,17 +209,22 @@ Each sensor has an expected sampling rate and valid measurement range.
 
 | sensor_id | sampling_rate | expected_min | expected_max |
 |-----------|---------------|--------------|--------------|
-| pump01_temp_motor | 1 Hz | -20 | 150 |
-| pump01_vib_x | 5000 Hz | -50 | 50 |
-| pump01_vib_y | 5000 Hz | -50 | 50 |
-| pump01_current_l1 | 100 Hz | 0 | 100 |
-| pump01_pressure_inlet | 10 Hz | 0 | 25 |
+| pump01_temp_motor | 1 | -20 | 150 |
+| pump01_vib_x | 5000 | -50 | 50 |
+| pump01_vib_y | 5000 | -50 | 50 |
+| pump01_current_l1 | 100 | 0 | 100 |
+| pump01_pressure_inlet | 10 | 0 | 25 |
 
 Definitions:
 
 **sampling_rate**
 
-expected measurement frequency.
+expected measurement frequency in **measurements per second (Hz)**.
+
+Example:
+
+- sampling_rate = 1 → one measurement per second
+- sampling_rate = 5000 → 5000 measurements per second
 
 **expected_min**
 

@@ -2,7 +2,7 @@
 Standard für Sensordaten in Predictive-Maintenance-Anwendungen
 
 Version: 1.0  
-Verantwortlich: Data Engineering Team  
+Verantwortlich: Heiko
 
 Dieses Dokument definiert das **verpflichtende Schema, Naming-Konventionen, Sampling-Regeln sowie Datenqualitätsanforderungen** für Sensordatensätze, die in der Predictive-Maintenance-Pipeline verwendet werden.
 

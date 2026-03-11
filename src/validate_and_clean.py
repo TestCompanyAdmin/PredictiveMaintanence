@@ -115,6 +115,7 @@ def main():
     df, stuck_count = detect_stuck(df)
     df, jump_count = detect_jumps(df)
 
+    df["quality_flag"] = df["quality_flag"].fillna(0).astype(int)
     df.to_parquet(CLEAN_PATH, index=False)
 
     report = {

@@ -1,12 +1,12 @@
 # Data Contract v1
-Predictive Maintenance Sensor Data Standard
+Standard für Sensordaten in Predictive-Maintenance-Anwendungen
 
 Version: 1.0  
-Owner: Data Engineering Team  
+Verantwortlich: Data Engineering Team  
 
-This document defines the **mandatory schema, naming conventions, sampling rules and data quality constraints** for sensor datasets used in the predictive maintenance pipeline.
+Dieses Dokument definiert das **verpflichtende Schema, Naming-Konventionen, Sampling-Regeln sowie Datenqualitätsanforderungen** für Sensordatensätze, die in der Predictive-Maintenance-Pipeline verwendet werden.
 
-The contract guarantees compatibility with downstream processing:
+Der Vertrag garantiert die Kompatibilität mit der nachgelagerten Datenverarbeitung:
 
 ```
 export_raw.py → raw.parquet
@@ -14,17 +14,17 @@ validate_and_clean.py → clean.parquet
 build_features.py → features.parquet
 ```
 
-Any dataset violating this contract must be rejected.
+Datensätze, die diesen Vertrag verletzen, müssen zurückgewiesen werden.
 
 ---
 
-# 1 Dataset Overview
+# 1 Überblick über den Datensatz
 
-Sensor datasets contain time series measurements collected from industrial assets.
+Sensordatensätze enthalten Zeitreihenmessungen, die von industriellen Anlagen erfasst werden.
 
-Each row represents **one measurement from one sensor at a specific timestamp**.
+Jede Zeile repräsentiert **eine Messung eines Sensors zu einem bestimmten Zeitpunkt**.
 
-Example:
+Beispiel:
 
 | ts | sensor_id | value |
 |----|-----------|------|
@@ -32,29 +32,29 @@ Example:
 
 ---
 
-# 2 Mandatory Columns
+# 2 Verpflichtende Spalten
 
-Datasets must contain **exactly the following columns**.
+Datensätze müssen **genau die folgenden Spalten enthalten**.
 
-No additional columns are allowed.
+Weitere Spalten sind nicht erlaubt.
 
 | column | type | description |
 |------|------|-------------|
-| ts | timestamp | measurement timestamp (UTC) |
-| sensor_id | string | unique sensor identifier |
-| value | float | measured value |
+| ts | timestamp | Zeitstempel der Messung (UTC) |
+| sensor_id | string | eindeutige Sensor-ID |
+| value | float | gemessener Sensorwert |
 
-clean.parquet contains an additional column:
+`clean.parquet` enthält zusätzlich eine weitere Spalte:
 
-| quality_flag | int | data quality indicator (clean dataset only) |
+| quality_flag | int | Indikator für die Datenqualität (nur im bereinigten Datensatz) |
 
-Example row (raw.parquet):
+Beispielzeile (`raw.parquet`):
 
 | ts | sensor_id | value |
 |----|-----------|------|
 | 2025-01-01T10:00:00Z | pump01_temp_motor | 63.2 |
 
-Example row (clean.parquet):
+Beispielzeile (`clean.parquet`):
 
 | ts | sensor_id | value | quality_flag |
 |----|-----------|------|--------------|
@@ -62,22 +62,28 @@ Example row (clean.parquet):
 
 ---
 
-# 3 Data Types
+# 3 Datentypen
 
 | column | datatype | constraints |
 |------|-----------|-------------|
-| ts | timestamp (ISO 8601) | must be UTC |
-| sensor_id | string | must follow naming convention |
-| value | float64 | numeric sensor measurement |
+| ts | timestamp (ISO 8601) | muss UTC sein |
+| sensor_id | string | muss der Naming-Konvention folgen |
+| value | float64 | numerischer Sensorwert |
 
-Rules:
+Bereinigter Datensatz (`clean.parquet`) enthält zusätzlich:
 
-- timestamps must be parseable
-- timestamps must be sortable
-- sensor_id must follow naming convention
-- value must be numeric
+| column | datatype | description |
+|------|-----------|-------------|
+| quality_flag | int | Kennzeichnung der Datenqualität |
 
-Example timestamp:
+Regeln:
+
+- Zeitstempel müssen parsebar sein
+- Zeitstempel müssen sortierbar sein
+- sensor_id muss der Naming-Konvention entsprechen
+- value muss numerisch sein
+
+Beispiel-Zeitstempel:
 
 ```
 2025-01-01T10:00:00Z
@@ -85,49 +91,49 @@ Example timestamp:
 
 ---
 
-# 4 Structural Rules
+# 4 Strukturelle Regeln
 
-## 4.1 Unique Measurement Constraint
+## 4.1 Eindeutige Messung
 
-The combination
+Die Kombination
 
 ```
 (ts, sensor_id)
 ```
 
-must be unique.
+muss eindeutig sein.
 
-Duplicates may appear in **raw.parquet**, but must be resolved during cleaning.
+Duplikate können in **raw.parquet** vorkommen, müssen jedoch während der Bereinigung entfernt werden.
 
 ---
 
-## 4.2 No Additional Columns
+## 4.2 Keine zusätzlichen Spalten
 
-Datasets must contain **only the mandatory columns**.
+Datensätze dürfen **nur die verpflichtenden Spalten** enthalten.
 
-If additional columns exist:
+Falls zusätzliche Spalten vorhanden sind:
 
 ```
-dataset must be rejected
+Datensatz muss abgelehnt werden
 ```
 
 ---
 
-## 4.3 Missing Values
+## 4.3 Fehlende Werte
 
-The column `value` must exist.
+Die Spalte `value` muss vorhanden sein.
 
-Raw datasets may contain missing values, but they will be handled during cleaning.
+Rohdatensätze können fehlende Werte enthalten, diese werden jedoch während der Datenbereinigung behandelt.
 
 ---
 
-## 4.4 Timestamp Requirements
+## 4.4 Anforderungen an Zeitstempel
 
-- timestamps must be UTC
-- timestamps must follow ISO-8601
-- timestamps must be sortable
+- Zeitstempel müssen UTC sein
+- Zeitstempel müssen dem ISO-8601-Format folgen
+- Zeitstempel müssen sortierbar sein
 
-Example:
+Beispiel:
 
 ```
 2025-01-01T10:00:00Z
@@ -135,15 +141,15 @@ Example:
 
 ---
 
-# 5 Sensor Naming Convention
+# 5 Naming-Konvention für Sensoren
 
-All sensor identifiers must follow the pattern:
+Alle Sensor-IDs müssen dem Muster folgen:
 
 ```
 <asset>_<sensorType>_<position>
 ```
 
-Examples:
+Beispiele:
 
 ```
 pump01_temp_motor
@@ -153,17 +159,17 @@ pump01_current_l1
 pump01_pressure_inlet
 ```
 
-Naming rules:
+Naming-Regeln:
 
 | rule | description |
 |----|-------------|
-| lowercase only | no uppercase characters |
-| underscore separator | `_` used between elements |
-| no spaces | spaces forbidden |
-| no special characters | except `_` |
-| consistent asset prefix | same asset naming |
+| nur Kleinbuchstaben | keine Großbuchstaben |
+| Unterstrich als Trenner | `_` wird verwendet |
+| keine Leerzeichen | Leerzeichen sind nicht erlaubt |
+| keine Sonderzeichen | außer `_` |
+| konsistenter Asset-Präfix | gleiche Maschinenbezeichnung |
 
-Allowed characters:
+Erlaubte Zeichen:
 
 ```
 a-z
@@ -171,7 +177,7 @@ a-z
 _
 ```
 
-Recommended validation regex:
+Empfohlene Validierungs-Regex:
 
 ```
 ^[a-z0-9]+_[a-z0-9]+_[a-z0-9]+$
@@ -179,23 +185,23 @@ Recommended validation regex:
 
 ---
 
-# 6 Asset Identification
+# 6 Identifikation der Anlage (Asset)
 
-The asset identifier is extracted from `sensor_id`.
+Die Anlagen-ID wird aus `sensor_id` extrahiert.
 
-Example:
+Beispiel:
 
 ```
 pump01_temp_motor
 ```
 
-Asset ID:
+Asset-ID:
 
 ```
 pump01
 ```
 
-This value will be used later in:
+Dieser Wert wird später verwendet in:
 
 ```
 features.parquet
@@ -203,9 +209,9 @@ features.parquet
 
 ---
 
-# 7 Sampling Definition
+# 7 Sampling-Definition
 
-Each sensor has an expected sampling rate and valid measurement range.
+Jeder Sensor besitzt eine erwartete Samplingrate sowie gültige Messbereiche.
 
 | sensor_id | sampling_rate | expected_min | expected_max |
 |-----------|---------------|--------------|--------------|
@@ -215,32 +221,32 @@ Each sensor has an expected sampling rate and valid measurement range.
 | pump01_current_l1 | 100 | 0 | 100 |
 | pump01_pressure_inlet | 10 | 0 | 25 |
 
-Definitions:
+Definitionen:
 
 **sampling_rate**
 
-expected measurement frequency in **measurements per second (Hz)**.
+Erwartete Messfrequenz in **Messungen pro Sekunde (Hz)**.
 
-Example:
+Beispiel:
 
-- sampling_rate = 1 → one measurement per second
-- sampling_rate = 5000 → 5000 measurements per second
+- sampling_rate = 1 → eine Messung pro Sekunde  
+- sampling_rate = 5000 → 5000 Messungen pro Sekunde  
 
 **expected_min**
 
-minimum plausible measurement.
+Minimal plausibler Messwert.
 
 **expected_max**
 
-maximum plausible measurement.
+Maximal plausibler Messwert.
 
-Values outside this range are considered **outliers**.
+Werte außerhalb dieses Bereichs gelten als **Ausreißer**.
 
 ---
 
-# 8 Unit Standardization
+# 8 Standardisierung von Einheiten
 
-All sensors must use standardized units.
+Alle Sensoren müssen standardisierte Einheiten verwenden.
 
 | measurement | unit |
 |-------------|------|
@@ -248,35 +254,35 @@ All sensors must use standardized units.
 | vibration | mm_s |
 | current | A |
 | pressure | bar |
-| time | s or ms |
+| time | s oder ms |
 
-Forbidden inconsistencies:
+Unzulässige Inkonsistenzen:
 
 ```
 C vs °C vs degC
 ```
 
-Each sensor type must use **one canonical unit**.
+Jeder Sensortyp darf **nur eine einheitliche Standard-Einheit** verwenden.
 
 ---
 
-# 9 Data Quality Issues
+# 9 Probleme mit der Datenqualität
 
-Raw sensor datasets may contain quality issues.
+Rohdatensätze können Qualitätsprobleme enthalten.
 
-These are handled during the cleaning stage.
+Diese werden während der Datenbereinigung behandelt.
 
-Defined issues:
+Definierte Probleme:
 
 | issue | description |
 |------|-------------|
-| missing values | NULL or NaN |
-| duplicates | identical (ts, sensor_id) |
-| outliers | outside expected range |
-| sensor stuck | constant value ≥ 30 seconds |
-| signal jumps | sudden abnormal changes |
+| missing values | NULL oder NaN |
+| duplicates | identische Kombination (ts, sensor_id) |
+| outliers | außerhalb des erwarteten Wertebereichs |
+| sensor stuck | konstanter Wert ≥ 30 Sekunden |
+| signal jumps | plötzliche Signaländerungen |
 
-Cleaning is implemented in:
+Die Bereinigung wird implementiert in:
 
 ```
 validate_and_clean.py
@@ -284,56 +290,56 @@ validate_and_clean.py
 
 ---
 
-# 10 Duplicate Handling
+# 10 Behandlung von Duplikaten
 
-Duplicates are defined as:
-
-```
-same (ts, sensor_id)
-```
-
-Cleaning rule:
+Duplikate sind definiert als:
 
 ```
-average value
-keep one row
+gleiche Kombination (ts, sensor_id)
+```
+
+Bereinigungsregel:
+
+```
+Mittelwert bilden
+eine Zeile behalten
 ```
 
 ---
 
-# 11 Missing Sensor Data
+# 11 Fehlende Sensordaten
 
 Definition:
 
 ```
-value = NULL or NaN
+value = NULL oder NaN
 ```
 
-Cleaning rules:
+Bereinigungsregeln:
 
-| gap duration | action |
+| Lückendauer | Aktion |
 |--------------|--------|
-| ≤ 5 seconds | linear interpolation |
-| > 5 seconds | value = null |
+| ≤ 5 Sekunden | lineare Interpolation |
+| > 5 Sekunden | value = null |
 
-Quality flag assignment:
+Zuweisung von quality_flag:
 
-| condition | flag |
+| Bedingung | flag |
 |-----------|------|
-| interpolated | 1 |
-| missing | 2 |
+| interpoliert | 1 |
+| fehlend | 2 |
 
 ---
 
-# 12 Outlier Handling
+# 12 Behandlung von Ausreißern
 
 Definition:
 
 ```
-value outside expected_min / expected_max
+value außerhalb expected_min / expected_max
 ```
 
-Cleaning rule:
+Bereinigungsregel:
 
 ```
 value = null
@@ -342,15 +348,15 @@ quality_flag = 2
 
 ---
 
-# 13 Sensor Stuck Detection
+# 13 Erkennung festhängender Sensoren
 
 Definition:
 
 ```
-identical value for ≥ 30 seconds
+identischer Wert über ≥ 30 Sekunden
 ```
 
-Action:
+Aktion:
 
 ```
 quality_flag = 2
@@ -358,7 +364,7 @@ quality_flag = 2
 
 ---
 
-# 14 Jump Detection
+# 14 Erkennung von Signalsprüngen
 
 Definition:
 
@@ -366,83 +372,83 @@ Definition:
 |value(t) − value(t−1)| > 5 × rolling_std(60s)
 ```
 
-Action:
+Aktion:
 
 ```
 quality_flag = 1
-value remains unchanged
+value bleibt unverändert
 ```
 
 ---
 
-# 15 Quality Flag Definition
+# 15 Definition der Quality Flags
 
-| flag | meaning |
-|-----|---------|
-| 0 | valid measurement |
-| 1 | suspicious but usable |
-| 2 | invalid measurement |
+| flag | Bedeutung |
+|-----|-----------|
+| 0 | gültige Messung |
+| 1 | verdächtige, aber nutzbare Messung |
+| 2 | ungültige Messung |
 
-The column `quality_flag` is added during the cleaning stage.
-
----
-
-# 16 Raw Dataset Definition
-
-`raw.parquet` must satisfy:
-
-- correct schema
-- correct datatypes
-- valid sensor naming
-
-However it may contain:
-
-- duplicates
-- missing values
-- outliers
-- stuck sensors
-- signal jumps
+Die Spalte `quality_flag` wird während der Bereinigung hinzugefügt.
 
 ---
 
-# 17 Clean Dataset Definition
+# 16 Definition des Rohdatensatzes
 
-`clean.parquet` must contain:
+`raw.parquet` muss erfüllen:
 
-- resolved duplicates
-- interpolated missing values
-- flagged outliers
-- detected sensor anomalies
-- column `quality_flag`
+- korrektes Schema
+- korrekte Datentypen
+- gültige Sensorbenennung
 
-The dataset must be **reproducible from raw.parquet**.
+Darf jedoch enthalten:
+
+- Duplikate
+- fehlende Werte
+- Ausreißer
+- festhängende Sensoren
+- Signalsprünge
 
 ---
 
-# 18 Versioning
+# 17 Definition des bereinigten Datensatzes
 
-Data contracts must follow versioning.
+`clean.parquet` muss enthalten:
 
-Example:
+- entfernte Duplikate
+- interpolierte fehlende Werte
+- markierte Ausreißer
+- erkannte Sensoranomalien
+- Spalte `quality_flag`
+
+Der Datensatz muss **reproduzierbar aus raw.parquet erzeugbar** sein.
+
+---
+
+# 18 Versionierung
+
+Data Contracts müssen versioniert werden.
+
+Beispiel:
 
 ```
 data_contract_v1.md
 data_contract_v2.md
 ```
 
-Changes require:
+Änderungen erfordern:
 
-- pull request
-- documentation update
-- compatibility check
+- Pull Request
+- Aktualisierung der Dokumentation
+- Kompatibilitätsprüfung der Pipeline
 
 ---
 
-# 19 Compliance
+# 19 Einhaltung des Vertrags
 
-Any dataset violating this contract must be rejected during ingestion.
+Datensätze, die diesen Vertrag verletzen, müssen während der Datenaufnahme abgelehnt werden.
 
-Validation will be implemented in:
+Die Validierung wird implementiert in:
 
 ```
 validate_and_clean.py
@@ -450,4 +456,4 @@ validate_and_clean.py
 
 ---
 
-# End of Data Contract
+# Ende des Data Contracts

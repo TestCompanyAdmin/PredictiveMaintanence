@@ -33,7 +33,9 @@ Jede Stufe transformiert den Datensatz und bereitet ihn für den nächsten Verar
 ```
 PredictiveMaintanence
 │
+├── README.md
 ├── data_contract_v1.md
+├── requirements.txt
 │
 ├── data
 │   ├── example_raw.parquet
@@ -49,11 +51,8 @@ PredictiveMaintanence
 │   ├── validate_and_clean.py
 │   └── build_features.py
 │
-├── tests
-│   └── test_pipeline.py
-│
-├── requirements.txt
-└── README.md
+└── tests
+    └── test_pipeline.py
 ```
 
 ---

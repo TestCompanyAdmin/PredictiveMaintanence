@@ -1,14 +1,14 @@
-# Predictive Maintenance Data Pipeline
+# Predictive-Maintenance Datenpipeline
 
-This repository contains a simple data engineering pipeline for processing industrial sensor data used in predictive maintenance.
+Dieses Repository enthält eine einfache Data-Engineering-Pipeline zur Verarbeitung industrieller Sensordaten für Predictive-Maintenance-Anwendungen.
 
-The project defines a **data contract**, validates raw sensor data, cleans it, and generates features for further analysis or machine learning.
+Das Projekt definiert einen **Data Contract**, validiert Rohdaten von Sensoren, bereinigt diese und erzeugt daraus Features für Analysen oder Machine-Learning-Anwendungen.
 
 ---
 
-# Project Overview
+# Projektübersicht
 
-The pipeline processes sensor time series data in three main steps:
+Die Pipeline verarbeitet Sensordaten in drei Hauptschritten:
 
 ```
 export_raw.py
@@ -24,11 +24,11 @@ build_features.py
 features.parquet
 ```
 
-Each stage transforms the dataset and prepares it for the next processing step.
+Jede Stufe transformiert den Datensatz und bereitet ihn für den nächsten Verarbeitungsschritt vor.
 
 ---
 
-# Repository Structure
+# Repository-Struktur
 
 ```
 PredictiveMaintanence
@@ -60,28 +60,28 @@ PredictiveMaintanence
 
 # Data Contract
 
-The dataset schema and validation rules are defined in:
+Das Schema der Sensordaten sowie die Validierungsregeln sind definiert in:
 
 ```
 data_contract_v1.md
 ```
 
-The contract specifies:
+Der Data Contract legt fest:
 
-- mandatory columns
-- naming conventions
-- sampling rates
-- valid measurement ranges
-- data quality rules
-- cleaning rules
+- verpflichtende Spalten
+- Naming-Konventionen für Sensoren
+- Samplingraten
+- zulässige Messbereiche
+- Datenqualitätsregeln
+- Regeln für die Datenbereinigung
 
-Any dataset violating this contract must be rejected.
+Datensätze, die diesen Vertrag verletzen, dürfen nicht verarbeitet werden.
 
 ---
 
-# Data Pipeline
+# Datenpipeline
 
-## 1 Export Raw Data
+## 1 Export der Rohdaten
 
 Script:
 
@@ -89,25 +89,25 @@ Script:
 src/export_raw.py
 ```
 
-Purpose:
+Aufgabe:
 
-- create or load raw sensor data
-- store dataset as
+- Rohdaten von Sensoren erzeugen oder laden
+- Speicherung als
 
 ```
 data/raw.parquet
 ```
 
-Raw data may contain:
+Die Rohdaten können enthalten:
 
-- missing values
-- duplicates
-- outliers
-- sensor anomalies
+- fehlende Werte
+- doppelte Messungen
+- Ausreißer
+- Sensoranomalien
 
 ---
 
-## 2 Validate and Clean Data
+## 2 Validierung und Bereinigung der Daten
 
 Script:
 
@@ -128,31 +128,31 @@ data/clean.parquet
 reports/quality_report.json
 ```
 
-Cleaning steps:
+Bereinigungsschritte:
 
-- duplicate removal
-- missing value handling
-- outlier detection
-- sensor stuck detection
-- jump detection
+- Entfernen von Duplikaten
+- Behandlung fehlender Werte
+- Erkennung von Ausreißern
+- Erkennung festhängender Sensoren
+- Erkennung plötzlicher Signaländerungen
 
-The script adds a column:
+Das Skript fügt eine zusätzliche Spalte hinzu:
 
 ```
 quality_flag
 ```
 
-Meaning:
+Bedeutung:
 
-| flag | meaning |
-|-----|--------|
-| 0 | valid |
-| 1 | suspicious |
-| 2 | invalid |
+| Flag | Bedeutung |
+|-----|-----------|
+| 0 | gültige Messung |
+| 1 | verdächtige Messung |
+| 2 | ungültige Messung |
 
 ---
 
-## 3 Feature Generation
+## 3 Feature-Generierung
 
 Script:
 
@@ -172,29 +172,29 @@ Output:
 data/features.parquet
 ```
 
-Generated features include:
+Erzeugte Features können enthalten:
 
-- mean
-- standard deviation
-- minimum
-- maximum
+- Mittelwert
+- Standardabweichung
+- Minimum
+- Maximum
 - RMS
-- percentiles
-- signal slope
+- Perzentile
+- Signaltrend (Slope)
 
-These features are used for predictive maintenance analysis.
+Diese Features können für Predictive-Maintenance-Analysen oder Machine Learning genutzt werden.
 
 ---
 
-# Requirements
+# Voraussetzungen
 
-Install dependencies:
+Abhängigkeiten installieren mit:
 
 ```
 pip install -r requirements.txt
 ```
 
-Required libraries:
+Benötigte Python-Bibliotheken:
 
 - pandas
 - numpy
@@ -203,9 +203,9 @@ Required libraries:
 
 ---
 
-# Running the Pipeline
+# Pipeline ausführen
 
-Execute scripts in the following order:
+Die Skripte werden in folgender Reihenfolge ausgeführt:
 
 ```
 python src/export_raw.py
@@ -215,9 +215,9 @@ python src/build_features.py
 
 ---
 
-# Testing
+# Tests
 
-Basic pipeline tests are located in:
+Einfache Pipeline-Tests befinden sich in:
 
 ```
 tests/test_pipeline.py
@@ -225,13 +225,13 @@ tests/test_pipeline.py
 
 ---
 
-# Purpose of the Project
+# Zweck des Projekts
 
-This repository demonstrates a simplified industrial data pipeline for predictive maintenance applications.
+Dieses Repository demonstriert eine vereinfachte industrielle Datenpipeline für Predictive-Maintenance-Anwendungen.
 
-It focuses on:
+Der Fokus liegt auf:
 
-- data contracts
-- data validation
-- cleaning sensor time series
-- feature extraction
+- Data Contracts
+- Datenvalidierung
+- Bereinigung von Sensordaten
+- Feature-Generierung für Analysen

@@ -36,6 +36,7 @@ PredictiveMaintanence
 ├── README.md
 ├── data_contract_v1.md
 ├── requirements.txt
+├── run_pipeline.py
 │
 ├── data
 │   ├── example_raw.parquet

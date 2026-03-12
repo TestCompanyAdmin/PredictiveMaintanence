@@ -1,0 +1,33 @@
+windowing:
+  window_size_seconds: 60
+  step_size_seconds: 30
+
+features:
+  statistical:
+    - mean
+    - std
+    - min
+    - max
+    - rms
+
+  trend:
+    - slope
+
+quality_features:
+  - invalid_ratio
+  - missing_ratio
+  - out_of_range_ratio
+
+sensor_groups:
+  vibration:
+    - vibration_x
+    - vibration_y
+
+  temperature:
+    - temp_motor
+
+  pressure:
+    - pressure_inlet
+
+  rotation:
+    - rpm_motor

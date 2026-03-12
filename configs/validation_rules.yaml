@@ -1,0 +1,41 @@
+assets:
+  - pump_1
+  - pump_2
+
+allowed_sensors:
+  temp_motor:
+    unit: C
+    min: -20
+    max: 180
+    sampling_hz: 1
+
+  pressure_inlet:
+    unit: bar
+    min: 0
+    max: 25
+    sampling_hz: 2
+
+  rpm_motor:
+    unit: rpm
+    min: 0
+    max: 6000
+    sampling_hz: 1
+
+  vibration_x:
+    unit: mm/s
+    min: 0
+    max: 50
+    sampling_hz: 10
+
+  vibration_y:
+    unit: mm/s
+    min: 0
+    max: 50
+    sampling_hz: 10
+
+policies:
+  unknown_sensor: flag
+  wrong_unit: flag
+  out_of_range: flag
+  missing_value: flag
+  duplicate_timestamp: flag

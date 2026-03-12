@@ -1,0 +1,26 @@
+required_columns:
+  - ts
+  - asset_id
+  - sensor_id
+  - value
+  - unit
+
+column_types:
+  ts: datetime
+  asset_id: string
+  sensor_id: string
+  value: float
+  unit: string
+  quality_flag: string
+
+allowed_units:
+  temperature: ["C"]
+  vibration: ["mm/s", "g"]
+  pressure: ["bar"]
+  rpm: ["rpm"]
+
+required_not_null:
+  - ts
+  - asset_id
+  - sensor_id
+  - value

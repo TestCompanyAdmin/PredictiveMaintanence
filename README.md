@@ -1,237 +1,239 @@
-# Predictive-Maintenance Datenpipeline
+# Predictive Maintenance Pipeline
 
-Dieses Repository enthält eine einfache Data-Engineering-Pipeline zur Verarbeitung industrieller Sensordaten für Predictive-Maintenance-Anwendungen.
+## Überblick
 
-Das Projekt definiert einen **Data Contract**, validiert Rohdaten von Sensoren, bereinigt diese und erzeugt daraus Features für Analysen oder Machine-Learning-Anwendungen.
+Dieses Repository enthält eine modulare Datenpipeline für ein Predictive-Maintenance-System. Ziel ist es, Sensordaten strukturiert aufzubereiten, zu validieren, zu bereinigen und daraus Features für spätere Machine-Learning-Modelle zu generieren.
 
----
+Die Pipeline verfolgt folgende Designprinzipien:
 
-# Projektübersicht
+- reproduzierbare Datenverarbeitung
+- klare Trennung der Verarbeitungsschritte
+- strikte Schema- und Datenvalidierung
+- konfigurierbare Feature-Generierung
+- transparente Data-Quality-Berichte
+- modulare Erweiterbarkeit für spätere Modelle
 
-Die Pipeline verarbeitet Sensordaten in drei Hauptschritten:
-
-```
-export_raw.py
-        ↓
-raw.parquet
-        ↓
-validate_and_clean.py
-        ↓
-clean.parquet + quality_report.json
-        ↓
-build_features.py
-        ↓
-features.parquet
-```
-
-Jede Stufe transformiert den Datensatz und bereitet ihn für den nächsten Verarbeitungsschritt vor.
+Die Pipeline verarbeitet Rohdaten Schritt für Schritt bis zu einem Feature-Datensatz, der später für Modelltraining oder Inferenz genutzt werden kann.
 
 ---
 
-# Repository-Struktur
+# Pipeline-Architektur
 
-```
-PredictiveMaintanence
-│
-├── README.md
-├── data_contract_v1.md
-├── requirements.txt
-├── run_pipeline.py
-│
-├── data
-│   ├── example_raw.parquet
-│   ├── raw.parquet
-│   ├── clean.parquet
-│   └── features.parquet
-│
-├── reports
-│   └── quality_report.json
-│
-├── src
-│   ├── export_raw.py
-│   ├── validate_and_clean.py
-│   └── build_features.py
-│
-└── tests
-    └── test_pipeline.py
-```
+Die Daten durchlaufen mehrere klar getrennte Verarbeitungsschritte.
+
+Raw Data  
+→ Ingestion  
+→ Schema Validation  
+→ Value Validation  
+→ Data Cleaning  
+→ Feature Engineering  
+→ Feature Dataset
+
+Jeder Schritt erzeugt ein eigenes Artefakt im `data/` Verzeichnis, sodass Zwischenergebnisse jederzeit überprüft werden können.
 
 ---
 
-# Data Contract
+# Projektstruktur
 
-Das Schema der Sensordaten sowie die Validierungsregeln sind definiert in:
+PredictiveMaintanence/
 
-```
-data_contract_v1.md
-```
+configs/  
+ data_contract.yaml  
+ feature_config.yaml  
+ validation_rules.yaml  
 
-Der Data Contract legt fest:
+data/  
+ raw/  
+  raw.parquet  
 
-- verpflichtende Spalten
-- Naming-Konventionen für Sensoren
-- Samplingraten
-- zulässige Messbereiche
-- Datenqualitätsregeln
-- Regeln für die Datenbereinigung
+ validated/  
+  validated.parquet  
 
-Datensätze, die diesen Vertrag verletzen, dürfen nicht verarbeitet werden.
+ clean/  
+  clean.parquet  
 
----
+ features/  
+  features.parquet  
 
-# Datenpipeline
+reports/  
+ data_quality/  
+  quality_report.json  
 
-## 1 Export der Rohdaten
+src/  
+ ingestion/  
+  export_raw.py  
 
-Script:
+ validation/  
+  validate_schema.py  
+  validate_values.py  
+  quality_flags.py  
+  write_quality_report.py  
 
-```
-src/export_raw.py
-```
+ cleaning/  
+  clean_data.py  
 
-Aufgabe:
+ features/  
+  build_features.py  
 
-- Rohdaten von Sensoren erzeugen oder laden
-- Speicherung als
+ utils/  
+  paths.py  
 
-```
-data/raw.parquet
-```
+ run_pipeline.py  
 
-Die Rohdaten können enthalten:
+tests/  
+ test_pipeline.py  
 
-- fehlende Werte
-- doppelte Messungen
-- Ausreißer
-- Sensoranomalien
-
----
-
-## 2 Validierung und Bereinigung der Daten
-
-Script:
-
-```
-src/validate_and_clean.py
-```
-
-Input:
-
-```
-data/raw.parquet
-```
-
-Output:
-
-```
-data/clean.parquet
-reports/quality_report.json
-```
-
-Bereinigungsschritte:
-
-- Entfernen von Duplikaten
-- Behandlung fehlender Werte
-- Erkennung von Ausreißern
-- Erkennung festhängender Sensoren
-- Erkennung plötzlicher Signaländerungen
-
-Das Skript fügt eine zusätzliche Spalte hinzu:
-
-```
-quality_flag
-```
-
-Bedeutung:
-
-| Flag | Bedeutung |
-|-----|-----------|
-| 0 | gültige Messung |
-| 1 | verdächtige Messung |
-| 2 | ungültige Messung |
+requirements.txt  
+README.md  
 
 ---
 
-## 3 Feature-Generierung
+# Pipeline-Ausführung
 
-Script:
+Die gesamte Pipeline wird zentral über `run_pipeline.py` gestartet.
 
-```
-src/build_features.py
-```
+Ausführung aus dem Repository-Root:
 
-Input:
+python -m src.run_pipeline
 
-```
-data/clean.parquet
-```
+Die Pipeline führt dabei nacheinander folgende Schritte aus:
 
-Output:
-
-```
-data/features.parquet
-```
-
-Erzeugte Features können enthalten:
-
-- Mittelwert
-- Standardabweichung
-- Minimum
-- Maximum
-- RMS
-- Perzentile
-- Signaltrend (Slope)
-
-Diese Features können für Predictive-Maintenance-Analysen oder Machine Learning genutzt werden.
+1. Rohdaten exportieren oder einlesen
+2. Schema validieren
+3. Werte validieren
+4. Quality Flags erzeugen
+5. Data Quality Report schreiben
+6. Daten bereinigen
+7. Features generieren
 
 ---
 
-# Voraussetzungen
+# Datenartefakte
 
-Abhängigkeiten installieren mit:
+Während der Pipeline entstehen mehrere definierte Datensätze.
 
-```
-pip install -r requirements.txt
-```
+Rohdaten  
+data/raw/raw.parquet
 
-Benötigte Python-Bibliotheken:
+Validierte Daten  
+data/validated/validated.parquet
 
-- pandas
-- numpy
-- pyarrow
-- scipy
+Bereinigte Daten  
+data/clean/clean.parquet
+
+Feature-Datensatz  
+data/features/features.parquet
+
+Data Quality Bericht  
+reports/data_quality/quality_report.json
 
 ---
 
-# Pipeline ausführen
+# Konfigurationsdateien
 
-Die Skripte werden in folgender Reihenfolge ausgeführt:
+Die Pipeline ist stark konfigurationsbasiert aufgebaut.
 
-```
-python src/export_raw.py
-python src/validate_and_clean.py
-python src/build_features.py
-```
+configs/data_contract.yaml  
+Definiert das erwartete Datenschema der Rohdaten.
+
+configs/validation_rules.yaml  
+Definiert Validierungsregeln für Sensordaten.
+
+configs/feature_config.yaml  
+Definiert Feature-Fenster und Featuretypen für das Feature Engineering.
+
+---
+
+# Zentrale Pfadverwaltung
+
+Alle Pfade werden zentral über
+
+src/utils/paths.py
+
+definiert.
+
+Dadurch können alle Skripte auf konsistente Projektpfade zugreifen, ohne harte Dateipfade zu verwenden.
+
+Beispielsweise:
+
+DATA_DIR  
+RAW_DIR  
+VALIDATED_DIR  
+CLEAN_DIR  
+FEATURE_DIR  
+REPORT_DIR  
+CONFIG_DIR  
+
+Neue Skripte sollten immer diese Pfaddefinitionen verwenden.
+
+---
+
+# Data Quality Konzept
+
+Die Pipeline implementiert mehrere Qualitätsmechanismen.
+
+Schema Validation  
+Überprüft Struktur und Datentypen der Rohdaten.
+
+Value Validation  
+Überprüft Sensordaten auf zulässige Wertebereiche.
+
+Quality Flags  
+Kennzeichnen potenziell fehlerhafte Messungen.
+
+Quality Report  
+Erzeugt eine zusammenfassende Qualitätsanalyse.
+
+Der Quality Report wird als JSON gespeichert:
+
+reports/data_quality/quality_report.json
 
 ---
 
 # Tests
 
-Einfache Pipeline-Tests befinden sich in:
+Das Repository enthält erste Pipeline-Tests.
 
-```
 tests/test_pipeline.py
-```
+
+Die Tests überprüfen aktuell:
+
+- Datenstruktur
+- Pipeline-Ausführung
+- grundlegende Feature-Generierung
 
 ---
 
-# Zweck des Projekts
+# Erweiterungsplanung
 
-Dieses Repository demonstriert eine vereinfachte industrielle Datenpipeline für Predictive-Maintenance-Anwendungen.
+Die aktuelle Pipeline deckt folgende Bereiche ab:
 
-Der Fokus liegt auf:
+Ingestion  
+Validation  
+Cleaning  
+Feature Engineering  
+Quality Reporting
 
-- Data Contracts
-- Datenvalidierung
-- Bereinigung von Sensordaten
-- Feature-Generierung für Analysen
+Geplante Erweiterungen:
+
+Model Training  
+Model Evaluation  
+Train/Test Splitting  
+Model Registry  
+Prediction Pipeline  
+Monitoring
+
+Der Ordner `src/models` ist bereits für diese Erweiterungen vorgesehen.
+
+---
+
+# Ziel des Projekts
+
+Die Pipeline bildet die Grundlage für ein skalierbares Predictive-Maintenance-System.
+
+Langfristig sollen darauf aufbauend folgende Komponenten integriert werden:
+
+- ML-Modelle zur Ausfallvorhersage
+- Remaining Useful Life Modelle
+- Online-Inferenz für Echtzeitdaten
+- Monitoring von Daten- und Modellqualität

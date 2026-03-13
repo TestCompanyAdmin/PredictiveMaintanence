@@ -89,11 +89,21 @@ def build_sensor_data() -> pd.DataFrame:
         "value"
     ] = 2.2
 
-    # Duplicate rows
+    # Duplicate rows (exact duplicates)
     dup_rows = df[
         (df["sensor_id"] == "temp_motor")
     ].sort_values("ts").iloc[20:22]
     df = pd.concat([df, dup_rows], ignore_index=True)
+
+    # Conflicting collision:
+    # same ts + asset_id + sensor_id, but different value
+    conflict_row = df[
+        (df["sensor_id"] == "pressure_inlet")
+    ].sort_values("ts").iloc[[40]].copy()
+
+    conflict_row["value"] = conflict_row["value"] + 5.0
+
+    df = pd.concat([df, conflict_row], ignore_index=True)
 
     return df
 

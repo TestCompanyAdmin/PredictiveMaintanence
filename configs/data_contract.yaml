@@ -11,7 +11,6 @@ column_types:
   sensor_id: string
   value: float
   unit: string
-  quality_flag: string
 
 allowed_units:
   temperature: ["C"]

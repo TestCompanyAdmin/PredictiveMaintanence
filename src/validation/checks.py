@@ -87,3 +87,29 @@ def count_sampling_mismatches_by_sensor(df, rules, tolerance_ratio=0.05):
             counts[sensor] = int(len(mismatch_df))
 
     return counts
+
+def get_conflicting_collision_mask(df):
+    grouped = (
+        df.groupby(["ts", "asset_id", "sensor_id"])
+        .agg(
+            value_nunique=("value", "nunique"),
+            unit_nunique=("unit", "nunique"),
+        )
+        .reset_index()
+    )
+
+    conflict_keys = grouped[
+        (grouped["value_nunique"] > 1) | (grouped["unit_nunique"] > 1)
+    ][["ts", "asset_id", "sensor_id"]]
+
+    if conflict_keys.empty:
+        return df.index.to_series().isin([])
+
+    conflict_df = df[["ts", "asset_id", "sensor_id"]].merge(
+        conflict_keys,
+        on=["ts", "asset_id", "sensor_id"],
+        how="left",
+        indicator=True,
+    )
+
+    return conflict_df["_merge"].eq("both").to_numpy()

@@ -9,14 +9,17 @@ features:
     - min
     - max
     - rms
-
-  trend:
     - slope
+    - sample_count
+    - zscore_mean
 
-quality_features:
-  - invalid_ratio
-  - missing_ratio
-  - out_of_range_ratio
+  quality:
+    - invalid_ratio
+    - missing_ratio
+    - out_of_range_ratio
+    - duplicate_ratio
+    - sampling_mismatch_ratio
+    - validated_sample_count
 
 sensor_groups:
   vibration:

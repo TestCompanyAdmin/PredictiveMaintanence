@@ -1,25 +1,26 @@
 {
-  "row_count": 2882,
+  "row_count": 2883,
   "quality_flag_counts": {
-    "GOOD": 2874,
-    "WARNING": 5,
-    "BAD": 3
+    "GOOD": 2873,
+    "BAD": 5,
+    "WARNING": 5
   },
   "quality_reason_counts": {
-    "valid": 2874,
+    "valid": 2873,
     "duplicate_row": 4,
     "missing_value": 3,
+    "conflicting_collision": 2,
     "out_of_range": 1
   },
   "is_usable_counts": {
-    "True": 2879,
-    "False": 3
+    "True": 2878,
+    "False": 5
   },
   "missing_sensors": [],
   "unknown_sensor": {},
   "sampling_mismatches_by_sensor": {
     "temp_motor": 2,
-    "pressure_inlet": 0,
+    "pressure_inlet": 1,
     "rpm_motor": 0,
     "vibration_x": 0,
     "vibration_y": 0

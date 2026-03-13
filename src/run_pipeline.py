@@ -21,17 +21,21 @@ def main():
     steps = [
         ("STEP 1: export raw", export_raw_main),
         ("STEP 2: validate schema", validate_schema_main),
-        ("STEP 3: print validation", print_validation_main),
-        ("STEP 4: apply quality flags", quality_flags_main),
+        ("STEP 3: apply quality flags", quality_flags_main),
+        ("STEP 4: print validation", print_validation_main),
         ("STEP 5: write quality report", write_quality_report_main),
         ("STEP 6: clean data", clean_data_main),
         ("STEP 7: build features", build_features_main),
     ]
+    
+    
+    step_results = {}
 
     for step_name, step_func in steps:
         print(f"\n{step_name}")
         try:
-            step_func()
+            result = step_func()
+            step_results[step_name] = result
             print(f"{step_name} -> OK")
         except Exception:
             print("\n" + "=" * 60)
@@ -40,10 +44,23 @@ def main():
             traceback.print_exc()
             raise
 
+    schema_result = step_results.get("STEP 2: validate schema")
+
+    if schema_result and schema_result.get("warnings"):
+        print("\n" + "-" * 60)
+        print("SCHEMA WARNINGS SUMMARY")
+        print("-" * 60)
+
+        for w in schema_result["warnings"]:
+            print(f"WARNING: {w}")
+
     print("\n" + "=" * 60)
     print("PIPELINE FINISHED SUCCESSFULLY")
     print("=" * 60)
-
+    
+    
+    
+    
 
 if __name__ == "__main__":
     main()

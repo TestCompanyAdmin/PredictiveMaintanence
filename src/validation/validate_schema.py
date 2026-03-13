@@ -25,10 +25,15 @@ def validate_columns(df: pd.DataFrame, contract: dict):
 
 def validate_not_null(df: pd.DataFrame, contract: dict):
     required_not_null = contract.get("required_not_null", [])
+    warnings = []
 
     for col in required_not_null:
         if df[col].isna().any():
-            print(f"WARNING: null values detected in column '{col}'")
+            count = int(df[col].isna().sum())
+            msg = f"null values detected in column '{col}' ({count} rows)"
+            warnings.append(msg)
+
+    return warnings
 
 
 def validate_dtypes(df: pd.DataFrame, contract: dict):
@@ -74,9 +79,12 @@ def main():
     contract = load_contract()
 
     validate_columns(df, contract)
-    validate_not_null(df, contract)
+    warnings = validate_not_null(df, contract)
     validate_dtypes(df, contract)
     validate_allowed_units(df, contract)
+
+    for w in warnings:
+        print(f"WARNING: {w}")
 
     VALIDATED_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -86,6 +94,14 @@ def main():
     print(f"validated dataset written to: {output_file}")
     print(f"rows: {len(df)}")
     print(f"columns: {list(df.columns)}")
+
+    return {
+        "status": "passed",
+        "warnings": warnings,
+        "rows": len(df),
+        "columns": list(df.columns),
+        "output_file": str(output_file),
+    }
 
 
 if __name__ == "__main__":
